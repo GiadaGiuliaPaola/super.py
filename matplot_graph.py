@@ -71,3 +71,4 @@ def plot_revenue(args):
     plt.show()
 
 plot_revenue(args)
+

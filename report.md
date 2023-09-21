@@ -1,83 +1,101 @@
-# SUPERPY -A GUIDE TO USE IT
+## Report three technical elements:
 
-## BUY A PRODUCT
+# PHARSER WITH TIME TRAVEL:
 
-**CLI**: _buy / name of the product / quantity / price / expire-date_
+-example bought report: 
 
-`python super.py buy Apple 10 0.5 2023-12-31`
-return > You bought 10 Apple.
+`elif args.command == 'bought_report':
+            inventory = args.func(args.bought_file)
+            if args.today:
+                table_bought = read_bought(args.bought_file)
+                print_bought(table_bought) 
+            elif args.days_ago is not None:
+                table_bought = read_bought(args.bought_file, days_ago=args.days_ago)
+                print_bought(table_bought)
+            else:
+                 table_bought = read_bought(args.bought_file)
+                 print_bought(table_bought)`
 
--save the item on [bought.cvs] with the date of acquisition and add a unique identity number >
-Bought Date,Product Name,Count,Cost Price,Expiration Date,ID number
--add the item on the inventory_file.csv > Product Name,Count,Buy Price,Expiration Date
+> this pharser permits to check the bought inventory now or in the past, on testing I found that insert a date for checking the what I have sold yesterday and the day before was annoying so I choose a different approach: days-ago. In order to make it work I used datetime and timedelta(days = days_ago). I think is working for this code because is fast, intuitive and easy to check. I took inspiration from my previous job as retail supervisor, when it was important to check the sale of the week (for replenishment as example). I replicate the same logic for the sold report.
+# REMOVE FILE
 
-You can check the report of how many product you bought today or previous days:
-**CLI** : *bought_report/ --today or --days-ago=days_*
-`python super.py bought_report --today bought_file.csv`
-`python super.py bought_report --days-ago=3 bought_file.csv`
+`def remove_product(product_name, count):
+    product_id = generate_product_id()
+    sell_date = datetime.now().strftime('%Y-%m-%d')
 
----
+    with open(inventory_file, 'r') as csv_file:
+        reader = csv.reader(csv_file)
+        rows = list(reader)
 
-## SELL A PRODUCT
+    found = False 
+    updated_rows = []
+    removed_rows = []
+    removed_quantity = 0
 
-**CLI**: *sell / name of the product / quantity*
-`python super.py sell Apple 12`
--if the product is available return > You sold 12 Apple.
-if the product is not available return > Product Apple is not available.
+    for row in rows:
+        if row[0] == product_name:
+           found = True
+           if int(row[1]) <= int(count):
+                    removed_quantity += int(row[1])
+                    removed_rows.append(row)
+                    continue
+           else:
+               row[1] = str(int(row[1]) - int(count))
+               removed_quantity += int(count)
+               removed_rows.append([row[0], count, row[2], row[3]])
+               cost_price = float(row[2])
+               selling_price = cost_price * (1 + 50 / 100)
+               removed_rows[-1][2] = selling_price
+        updated_rows.append(row)
 
--save the item on [sold.csv] with the date of selling, the price with the surplus of a markup 0f 50% of the cost price and the id of the item >
-Sell Date,Product Name,Count,Sell Price,Expiration Date,ID number
--remove the item from the [inventory_file.csv]
+    if found:
+        with open(inventory_file, 'w', newline='') as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerows(updated_rows)  
+        
+        with open('sold.csv', 'a', newline='') as sold_file:
+            writer = csv.writer(sold_file)
+            if sold_file.tell() == 0: 
+                writer.writerow(['Sell Date', 'Product Name', 'Count', 'Sell Price', 'Expiration Date', 'ID number'])
+            for removed_row in removed_rows:
+                writer.writerow([sell_date] + removed_row + [product_id])  
 
-You can check the report of how many product you sold today or previous days:
-**CLI**: *sold_report / --today or --days-ago=days*
-`python super.py sold_report --today sold_file.csv`
-`python super.py sold_report --days-ago=1 sold_file.csv`
+        print(f'You sold {removed_quantity} {product_name}.')
+    else:
+        print(f'Product {product_name} is not available.')`
 
----
+> This code will foud the item you want to sell, remove the file when sold from the inventory, register new file in a new cvs file name sold.csv, add a sell date to the item and a sell price with the mark up of 50% of the cost price and also will stop the sale if the item is not available in the inventory. 
 
-## INVENTORY FILE
+# MATPLOT_GRAPH
 
-All the product are getting update from the moment you buy or sell a product,
-to know what you have in your supermarket you can print the inventory_file:
+`def plot_revenue(args):
+    target_date = None
 
-**CLI**: *inventory / --now*
-`python super.py inventory --now inventory_file.csv`
-return > inventory_file in a tabulate
+    if args.today:
+        target_date = datetime.today()
+    elif args.date:
+        target_date = datetime.strptime(args.date, "%Y-%m-%d")
 
----
+    if target_date is None:
+        print("Invalid date format, please insert the date in YYYY-MM-DD.")
+        return
 
-## REVENUE
+    revenue = calculate_revenue(args)
 
-To have the sum of the items you sold in a certain date:
+    dates = list(revenue.keys())
+    revenue_values = list(revenue.values())
 
-If you want to check the revenue of today:
-**CLI**: *revenue / --today*
-`python super.py revenue sold.csv --today`
--return> Today's revenue so far: 0
+    fig, ax = plt.subplots()
+    ax.bar(dates, revenue_values)
+    plt.xlabel("Date")
+    plt.ylabel("Revenue")
+    plt.title("Revenue Report")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
 
-If is a previous date:
-**CLI**: *revenue/ --date YYYY-MM-DD*
-`python super.py revenue sold.csv --date 2023-09-18`
--return> Revenue from 2023-09-18: 0
+plot_revenue(args)`
 
----
+> I dedicate a page with pharser to this function. From the command line it will show the graph with the function of the revenue. In order to make it work during my test I had to create an extra function called 'calculate_revenue' which with a pre insert dictionary with the needed values. The result is histogram of how many product where sold. The code is set to detect today and also previos date (such months or years ago), and to be able to access the data of the sold.csv file.
 
-## PROFIT
 
-Is given by the sell price (price+markup) multiplied for the items sold.
-
-If you want to check the profit of today:
-**CLI**: *profit / --today*
-`python super.py profit sold.csv --today`
--return> Today's profit so far: 0
-
-If is a previous date:
-**CLI**:* profit/ --date YYYY-MM-DD*
-`python super.py profit sold.csv --date 2023-09-18`
-return> Profit from 2023-09-18: 0
-
-## MATPLOT
-**CLI**:*matplot file /  day you want to check / sold file*
-`python matplot_graph.py --today --sold-file sold.csv`
-return > A graph containing how many items as been selling during a day, is calculated on the revenue 

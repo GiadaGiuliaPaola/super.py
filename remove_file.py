@@ -24,7 +24,6 @@ def remove_product(product_name, count):
            if int(row[1]) <= int(count):
                     removed_quantity += int(row[1])
                     removed_rows.append(row)
-                    # count -= int(row[1])
                     continue
            else:
                row[1] = str(int(row[1]) - int(count))
