@@ -25,9 +25,9 @@ You can check the report of how many product you bought today or previous days:
 
 **CLI**: *sell / name of the product / quantity*
 
-`python super.py sell Apple 12`
+`python super.py sell Apple 3`
 
--if the product is available return > You sold 12 Apple.
+-if the product is available return > You sold 3 Apple.
 If the product is not available return > Product Apple is not available.
 
 -save the item on [sold.csv] with the date of selling, the price with the surplus of a markup 0f 50% of the cost price and the id of the item >

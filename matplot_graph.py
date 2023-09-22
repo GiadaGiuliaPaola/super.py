@@ -13,7 +13,7 @@ parser.add_argument("--sold-file", type=str, help="Path to the sold items CSV fi
 
 args = parser.parse_args()
 
-# function to define the data 
+# function to define some extra data to be used in the graph for testing purposes  
 def calculate_revenue(args):
     target_date = None
 
@@ -71,4 +71,3 @@ def plot_revenue(args):
     plt.show()
 
 plot_revenue(args)
-

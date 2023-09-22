@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from generate_id import generate_product_id
 
 inventory_file = 'inventory_file.csv'
+
 #REMOVE PRODUCT FUNCTION
 def remove_product(product_name, count):
     product_id = generate_product_id()

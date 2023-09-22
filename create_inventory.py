@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from generate_id import generate_product_id
 
 inventory_file = 'inventory_file.csv'
+
 #CREATE_INVENTORY
 def create_inventory_csv():
     header = ['Product Name', 'Count', 'Buy Price', 'Expiration Date', 'ID number']

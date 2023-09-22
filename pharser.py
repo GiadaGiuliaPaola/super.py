@@ -130,4 +130,4 @@ def main():
         elif args.command == 'profit':
             read_profit(args)
         elif args.command == 'check_expired':
-            args.func(args)
+            args.func(args.date, args.inventory_file)

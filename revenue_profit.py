@@ -3,6 +3,7 @@ import tabulate
 from datetime import datetime, timedelta
 
 sold_file = 'sold.csv'
+
 #REVENUE SOLD PRODUCTS
 def read_sold(sold_file, days_ago=0):
 

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from generate_id import generate_product_id
 
 inventory_file = 'inventory_file.csv'
+
 # ADD A PRODUCT FUNCTION
 def add_product(product_name, count, buy_price, expiration_date):
     product_id = generate_product_id()
@@ -18,7 +19,6 @@ def add_product(product_name, count, buy_price, expiration_date):
                 row[1] = str(int(row[1]) + int(count))
                 break    
     
-
     with open(inventory_file, 'w', newline='') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerows(rows)
