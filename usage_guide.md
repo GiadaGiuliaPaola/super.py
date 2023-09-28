@@ -1,5 +1,14 @@
 # SUPERPY -A GUIDE TO USE IT
 
+## TIME TRAVEL
+
+***CLI*** advance / days
+`python super.py advance 1`
+return > Advanced the internal day by 1 days. New day is: 2023-09-29
+
+***CLI*** go-back / days
+`python super.py go-back 1`
+Going back in time by 1 days. The date today is 2023-09-28
 ## BUY A PRODUCT
 
 **CLI**: _buy / name of the product / quantity / price / expire-date_
@@ -113,3 +122,4 @@ if an item is expired return> Product_name expired on date: expiration_date
 `python matplot_graph.py --today --sold-file sold.csv`
 
 return > A graph containing how many items as been selling during a day, is calculated on the revenue 
+

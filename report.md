@@ -1,7 +1,9 @@
 ## Report three technical elements:
 
 # INTERNAL CURRENT DAY
+> Read_day.py rovides a set of functions for managing and manipulating a "current day" date stored in a text file. It primarily serves as a tool for simulating changes in time. The read_current_day function reads the current day from a specified text file or returns the system date if the file is empty or contains an invalid date format. The save_current_day function saves a given date back to the text file.
 
+Two additional functions, advance_time and go_back_in_time, allow the user to manipulate the current day by advancing it forward or going back in time by a specified number of days, respectively. Each function updates the text file and provides feedback on the action taken. This script could be useful for scenarios that require managing a simulated timeline or date tracking.
 
 # PHARSER WITH TIME TRAVEL:
 
