@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from generate_id import generate_product_id
 from read_day import read_current_day
 
+current_day_file = r'C:\Users\marti\Desktop\Winc\superpy\current_day.txt'
 inventory_file = 'inventory_file.csv'
 
 #REMOVE PRODUCT FUNCTION
@@ -71,7 +72,7 @@ def read_sold(sold_file, days_ago=0, current_date=None):
         next(csv_reader)
 
         for row in csv_reader:
-            if row[0] == choose_date_str:
+            if str(row[0]) == str(choose_date_str):
                 item_sold_in_date.append(row)
 
     if not item_sold_in_date:

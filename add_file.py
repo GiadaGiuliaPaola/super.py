@@ -9,6 +9,8 @@ current_day_file = r'C:\Users\marti\Desktop\Winc\superpy\current_day.txt'
 inventory_file = 'inventory_file.csv'
 
 # ADD A PRODUCT FUNCTION
+
+
 def add_product(product_name, count, buy_price, expiration_date):
     product_id = generate_product_id()  # generate unique id for the product
     # get today date as bought date for the product
@@ -55,7 +57,7 @@ def add_product(product_name, count, buy_price, expiration_date):
 
 
 def read_bought(bought_file, days_ago=0, current_date=None):
-    
+
     if current_date is None:
         current_date = read_current_day(current_day_file)
 
@@ -69,7 +71,8 @@ def read_bought(bought_file, days_ago=0, current_date=None):
         next(csv_reader)
 
         for row in csv_reader:
-            if row[0] == choose_date_str:
+
+            if str(row[0]) == str(choose_date_str):
                 item_bought_in_date.append(row)
 
     if not item_bought_in_date:
