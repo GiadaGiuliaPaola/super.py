@@ -2,37 +2,40 @@ import csv
 import tabulate
 from datetime import datetime, timedelta
 from generate_id import generate_product_id
+from read_day import read_current_day
 
 inventory_file = 'inventory_file.csv'
 
 #REMOVE PRODUCT FUNCTION
-def remove_product(product_name, count):
+def remove_product(product_name, count, selling_price):
     product_id = generate_product_id()
-    sell_date = datetime.now().strftime('%Y-%m-%d')
+    sell_date = datetime.now().strftime('%Y-%m-%d') #get today date as selling date for the product
 
     with open(inventory_file, 'r') as csv_file:
         reader = csv.reader(csv_file)
         rows = list(reader)
 
-    found = False 
+    found = False # the item is declare not found
     updated_rows = []
     removed_rows = []
     removed_quantity = 0
 
+ # Check if there are enough item in inventory to sell
+    available_count = sum(int(row[1]) for row in rows if row[0] == product_name)
+    if int(count) > available_count:
+        print(f"Sorry, We only have {available_count} {product_name} available.")
+        return
+
     for row in rows:
-        if row[0] == product_name:
+        if row[0] == product_name: #take product name in inventory file
            found = True
-           if int(row[1]) <= int(count):
+           if int(row[1]) <= int(count): # row[1] take count in inventory
                     removed_quantity += int(row[1])
                     removed_rows.append(row)
-                    continue
            else:
                row[1] = str(int(row[1]) - int(count))
                removed_quantity += int(count)
                removed_rows.append([row[0], count, row[2], row[3]])
-               cost_price = float(row[2])
-               selling_price = cost_price * (1 + 50 / 100)
-               removed_rows[-1][2] = selling_price
         updated_rows.append(row)
 
     if found:
@@ -50,12 +53,16 @@ def remove_product(product_name, count):
         print(f'You sold {removed_quantity} {product_name}.')
     else:
         print(f'Product {product_name} is not available.')
+    
 
+# this function help to read the items that have been sell in a certain date
+def read_sold(sold_file, days_ago=0, current_date=None):
 
-def read_sold(sold_file, days_ago=0):
+    if current_date is None:
+        current_date = read_current_day(current_day_file)
 
     choose_date = datetime.now() - timedelta(days=days_ago)
-    choose_date_str = choose_date.strftime('%Y-%m-%d')
+    choose_date_str = current_date
   
     item_sold_in_date = []
 

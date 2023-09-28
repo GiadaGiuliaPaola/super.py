@@ -1,5 +1,8 @@
 ## Report three technical elements:
 
+# INTERNAL CURRENT DAY
+
+
 # PHARSER WITH TIME TRAVEL:
 
 -example bought report: 

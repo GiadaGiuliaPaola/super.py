@@ -46,14 +46,18 @@ def calculate_revenue(args):
 
     with open(args.sold_file, 'r') as file:
         reader = csv.reader(file)
-        next(reader)  
+        next(reader) #skip header row to avoid problems with reading data 
         for row in reader:
             item_date = datetime.fromisoformat(row[0]) 
             if item_date.date() == target_date.date():
-                total_revenue += float(row[2])  
+                selling_price = float(row[3]) #take the selling price
+                count = int(row[2])
+                revenue = selling_price * count  # Calculate revenue for the item
+                total_revenue += revenue 
 
     return total_revenue
 
+#function to read the revenue from today or other dates
 def read_revenue(args):
     total_revenue = calculate_revenue(args)
 
@@ -75,17 +79,40 @@ def calculate_profit(args):
         print("Invalid date format or missing date argument.")
         return 0  
 
-    total_profit = 0
+    total_revenue = calculate_revenue(args)
+    total_cost = 0
 
+    # read and calculating the cost from the bought.cvs file
+    cost_price_data = {}
+    with open('bought.csv', 'r') as cost_file:
+        reader = csv.reader(cost_file)
+        next(reader)  # Skip head row
+        for row in reader:
+            purchase_date = datetime.fromisoformat(row[0])
+            if purchase_date.date() <= target_date.date():
+                product_name = row[1] #take the product name
+                cost_price = float(row[3])  # take the cost price
+                if product_name in cost_price_data:
+                    cost_price_data[product_name] += cost_price
+                else:
+                    cost_price_data[product_name] = cost_price
+
+#read the sold file to get the selling price
     with open(args.sold_file, 'r') as file:
         reader = csv.reader(file)
         next(reader)  
         for row in reader:
             item_date = datetime.fromisoformat(row[0]) 
             if item_date.date() == target_date.date():
-                total_profit += (float(row[3])*float(row[2]) ) 
+                selling_price = float(row[3])  # take the selling price
+                count = int(row[2])
+                # Check if the product name is in the cost_price_data dictionary
+                if product_name in cost_price_data:
+                    cost_price = cost_price_data[product_name]
+                    total_cost += cost_price * count  # Calculate total cost for the item
 
-    return total_profit
+    profit = total_revenue - total_cost  # Calculate profit by removing total cost from revenue
+    return profit
 
 
 def read_profit(args):

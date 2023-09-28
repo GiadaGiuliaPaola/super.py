@@ -2,7 +2,9 @@ import csv
 import tabulate
 from datetime import datetime, timedelta
 from generate_id import generate_product_id
+from read_day import read_current_day
 
+current_day_file = r'C:\Users\marti\Desktop\Winc\superpy\current_day.txt'
 inventory_file = 'inventory_file.csv'
 
 #CREATE_INVENTORY
@@ -21,7 +23,10 @@ def create_inventory_csv():
         csv_writer.writerows(inventory)
 
 
-def read_inventory(inventory_file):
+def read_inventory(inventory_file, current_date=None):
+    if current_date is None:
+        current_date = read_current_day(current_day_file)
+
     with open(inventory_file, 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
         inventory = [row for row in csv_reader]

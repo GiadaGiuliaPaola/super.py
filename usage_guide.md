@@ -23,7 +23,7 @@ You can check the report of how many product you bought today or previous days:
 
 ## SELL A PRODUCT
 
-**CLI**: *sell / name of the product / quantity*
+**CLI**: *sell / name of the product / quantity / selling price*
 
 `python super.py sell Apple 3`
 

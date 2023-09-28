@@ -4,13 +4,28 @@ from remove_file import remove_product, read_sold, print_sold
 from create_inventory import read_inventory, print_inventory
 from revenue_profit import read_revenue, read_profit
 from expired_file import check_expired_items
+from read_day import advance_time, go_back_in_time, current_day_file, read_current_day
+
 
 def main():
-# Create a CLI parser e subparser
+    # Create a CLI parser e subparser
     parser = argparse.ArgumentParser(description='Superpy command line')
     subparsers = parser.add_subparsers(
         dest='command', help='Available commands')
 
+# TRAVEL IN TIME
+    advance_parser = subparsers.add_parser('advance')
+    advance_parser.add_argument(
+        "days", type=int, default=0, help="Number of days to advance.")
+    # advance_parser.set_defaults(func=advance_time)
+    advance_parser.set_defaults(
+        func=lambda args: advance_time(args.days, current_day_file))
+    go_back_parser = subparsers.add_parser('go-back')
+    go_back_parser.add_argument(
+        "days", type=int, default=0, help="Number of days to go back.")
+    # go_back_parser.set_defaults(func=go_back_in_time)
+    go_back_parser.set_defaults(
+        func=lambda args: go_back_in_time(args.days, current_day_file))
 # ADD PRODUCT WHEN PURCHASED
     add_parser = subparsers.add_parser(
         'buy', help='Add the product you buy on the inventory')
@@ -22,12 +37,14 @@ def main():
         'expiration_date', help='Expiration date YYYY-MM-DD ')
     add_parser.set_defaults(func=add_product)
 
-#REMOVE PRODUCT WHEN SOLD
+# REMOVE PRODUCT WHEN SOLD
     remove_parser = subparsers.add_parser(
         'sell', help='Remove the product you sold from the inventory')
     remove_parser.add_argument(
         'product_name', help='Name of the product to remove')
     remove_parser.add_argument('count', help='Count of the product')
+    remove_parser.add_argument(
+        'selling_price', type=float, help='Selling price per unit')
     remove_parser.set_defaults(func=remove_product)
 
 # display the inventory
@@ -39,7 +56,7 @@ def main():
         '--now', help='Include this flag to display the inventory', action='store_true')
     report_parser.set_defaults(func=read_inventory)
 
-#display sold report
+# display sold report
     report_parser = subparsers.add_parser(
         'sold_report', help='Display all the items sold')
     report_parser.add_argument(
@@ -47,10 +64,10 @@ def main():
     report_parser.add_argument(
         '--today', help='Include this flag to display the item sold today', action='store_true')
     report_parser.add_argument(
-    '--days-ago', type=int, default=0, help='Specify the number of days ago to check what as been previously sold.')
+        '--days-ago', type=int, default=0, help='Specify the number of days ago to check what as been previously sold.')
     report_parser.set_defaults(func=read_sold)
 
-#display bought report
+# display bought report
     bought_parser = subparsers.add_parser(
         'bought_report', help='Display all the items sold')
     bought_parser.add_argument(
@@ -58,22 +75,28 @@ def main():
     bought_parser.add_argument(
         '--today', help='Include this flag to display the item sold today', action='store_true')
     bought_parser.add_argument(
-    '--days-ago', type=int, default=0, help='Specify the number of days ago to check what as been previously sold.')
+        '--days-ago', type=int, default=0, help='Specify the number of days ago to check what as been previously sold.')
     bought_parser.set_defaults(func=read_bought)
- 
-#display revenue report
+
+# display revenue report
     report_parser = subparsers.add_parser('revenue', help='Display revenue')
-    report_parser.add_argument('sold_file', default='sold.csv', help='Path to the sold items CSV file')
-    report_parser.add_argument('--today', help='Include this flag to display today revenue', action='store_true')
-    report_parser.add_argument('--date', help='Specify a date in YYYY-MM format.')
+    report_parser.add_argument(
+        'sold_file', default='sold.csv', help='Path to the sold items CSV file')
+    report_parser.add_argument(
+        '--today', help='Include this flag to display today revenue', action='store_true')
+    report_parser.add_argument(
+        '--date', help='Specify a date in YYYY-MM format.')
     report_parser.set_defaults(func=read_revenue)
 
- 
-#display profit report
+
+# display profit report
     profit_parser = subparsers.add_parser('profit', help='Display profit')
-    profit_parser.add_argument('sold_file', default='sold.csv', help='Path to the sold items CSV file')
-    profit_parser.add_argument('--today', help='Include this flag to display today profit', action='store_true')
-    profit_parser.add_argument('--date', help='Specify a date in YYYY-MM format.')
+    profit_parser.add_argument(
+        'sold_file', default='sold.csv', help='Path to the sold items CSV file')
+    profit_parser.add_argument(
+        '--today', help='Include this flag to display today profit', action='store_true')
+    profit_parser.add_argument(
+        '--date', help='Specify a date in YYYY-MM format.')
     profit_parser.set_defaults(func=read_profit)
 
 # check if expired
@@ -87,47 +110,55 @@ def main():
 
     args = parser.parse_args()
 
-
-
     if hasattr(args, 'func'):
         if args.command == 'buy':
             args.func(args.product_name, args.count,
                       args.buy_price, args.expiration_date)
         elif args.command == 'sell':
-            args.func(args.product_name, args.count)
+            args.func(args.product_name, args.count, args.selling_price)
 
         elif args.command == 'inventory':
             inventory = args.func(args.inventory_file)
             if args.now:
                 print_inventory(inventory)
-        
+
         elif args.command == 'sold_report':
-            inventory = args.func(args.sold_file)
+            current_date = read_current_day(current_day_file)
+            inventory = args.func(args.sold_file, current_date=current_date)
             if args.today:
-                table_sold = read_sold(args.sold_file)
-                print_sold(table_sold) 
+                table_sold = read_sold(args.sold_file, current_date=current_date)
+                print_sold(table_sold)
             elif args.days_ago is not None:
-                table_sold = read_sold(args.sold_file, days_ago=args.days_ago)
+                table_sold = read_sold(args.sold_file, days_ago=args.days_ago, current_date=current_date)
                 print_sold(table_sold)
             else:
-                 table_sold = read_sold(args.sold_file)
-                 print_sold(table_sold)
+                table_sold = read_sold(args.sold_file)
+                print_sold(table_sold)
 
         elif args.command == 'bought_report':
-            inventory = args.func(args.bought_file)
+            current_date = read_current_day(current_day_file)
+            inventory = args.func(
+                args.bought_file, days_ago=args.days_ago, current_date=current_date)
             if args.today:
-                table_bought = read_bought(args.bought_file)
-                print_bought(table_bought) 
+                table_bought = read_bought(
+                    args.bought_file, current_date=current_date)
+                print_bought(table_bought)
             elif args.days_ago is not None:
-                table_bought = read_bought(args.bought_file, days_ago=args.days_ago)
+                table_bought = read_bought(
+                    args.bought_file, days_ago=args.days_ago, current_date=current_date)
                 print_bought(table_bought)
             else:
-                 table_bought = read_bought(args.bought_file)
-                 print_bought(table_bought)
-                 
+                table_bought = read_bought(
+                    args.bought_file, current_date=current_date)
+                print_bought(table_bought)
+
         elif args.command == 'revenue':
             read_revenue(args)
         elif args.command == 'profit':
             read_profit(args)
         elif args.command == 'check_expired':
             args.func(args.date, args.inventory_file)
+        elif args.command == 'advance':
+            advance_time(args.days)
+        elif args.command == 'go-back':
+            go_back_in_time(args.days)
