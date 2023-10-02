@@ -4,7 +4,7 @@ from create_inventory import read_inventory
 
 iventory_file='inventory_file.csv'
 
-# calculate if a product is expired or not
+# calculate if a product is expired or not and check if the inventory file have some expire product
 def is_expired(date_string, inventory_file):
     date = datetime.strptime(date_string, '%Y-%m-%d')
     expired_items = []
