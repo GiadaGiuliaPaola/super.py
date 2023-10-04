@@ -1,34 +1,12 @@
 import csv
-import tabulate
 from datetime import datetime, timedelta
 
+current_day_file = r'current_day.txt'
 sold_file = 'sold.csv'
 
-#REVENUE SOLD PRODUCTS
-def read_sold(sold_file, days_ago=0):
 
-    choose_date = datetime.now() - timedelta(days=days_ago)
-    choose_date_str = choose_date.strftime('%Y-%m-%d')
-  
-    item_sold_in_date = []
-
-    with open('sold.csv', 'r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        next(csv_reader)
-
-        for row in csv_reader:
-            if row[0] == choose_date_str:
-                item_sold_in_date.append(row)
-
-    if not item_sold_in_date:
-        return f"No items sold on {choose_date_str}."
-
-    table_sold = tabulate.tabulate(item_sold_in_date, headers=['sell_date', 'Product Name', 'Count', 'Sell Price'], tablefmt='pipe')
-    return table_sold
-
-def print_sold(table_sold):
-    print(table_sold)
-
+"""revenue work on today or a given day in the past,
+check the sold file and return the selling price * items sold"""
 #CALCULATE THE REVENUE
 def calculate_revenue(args):
     target_date = None
@@ -66,6 +44,9 @@ def read_revenue(args):
     elif args.date:
         print(f"Revenue from {args.date}: {total_revenue}")
 
+
+"""profit calculate the total cost on the bought file and
+again the revenue and return the profit made in a day"""
 #CALCULATE THE PROFIT PER DAY
 def calculate_profit(args):
     target_date = None
@@ -76,29 +57,28 @@ def calculate_profit(args):
         target_date = datetime.strptime(args.date, "%Y-%m-%d")
 
     if target_date is None:
-        print("Invalid date format or missing date argument.")
+        print("Invalid date format.")
         return 0  
 
-    total_revenue = calculate_revenue(args)
+    total_selling_price=0
     total_cost = 0
 
-    # read and calculating the cost from the bought.cvs file
-    cost_price_data = {}
+
+    # Read and calculate the cost from the bought.csv file
     with open('bought.csv', 'r') as cost_file:
         reader = csv.reader(cost_file)
-        next(reader)  # Skip head row
+        next(reader)  # Skip header row
         for row in reader:
             purchase_date = datetime.fromisoformat(row[0])
-            if purchase_date.date() <= target_date.date():
-                product_name = row[1] #take the product name
+            if purchase_date.date() == target_date.date():
                 cost_price = float(row[3])  # take the cost price
-                if product_name in cost_price_data:
-                    cost_price_data[product_name] += cost_price
-                else:
-                    cost_price_data[product_name] = cost_price
+                count = int(row[2])  # Take the quantity
+                
+                total_cost += cost_price * count  # Calculate total cost for this entry
+               
 
 #read the sold file to get the selling price
-    with open(args.sold_file, 'r') as file:
+    with open('sold.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)  
         for row in reader:
@@ -106,13 +86,12 @@ def calculate_profit(args):
             if item_date.date() == target_date.date():
                 selling_price = float(row[3])  # take the selling price
                 count = int(row[2])
-                # Check if the product name is in the cost_price_data dictionary
-                if product_name in cost_price_data:
-                    cost_price = cost_price_data[product_name]
-                    total_cost += cost_price * count  # Calculate total cost for the item
+                
+                total_selling_price += selling_price * count 
 
-    profit = total_revenue - total_cost  # Calculate profit by removing total cost from revenue
-    return profit
+    total_profit = total_selling_price - total_cost  # Calculate profit by subtracting total cost from revenue
+    return total_profit
+    
 
 
 def read_profit(args):

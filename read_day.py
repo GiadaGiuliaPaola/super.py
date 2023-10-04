@@ -1,7 +1,11 @@
 import os
 import datetime
 
-current_day_file = r'C:\Users\marti\Desktop\Winc\superpy\current_day.txt'
+current_day_file = r'current_day.txt'
+
+"""create a new day file that will be set as today,
+and can be used on assotiation with
+read the bought or the sold file"""
 
 # Function to read the current day from a text file or return the current system date
 def read_current_day(filename):

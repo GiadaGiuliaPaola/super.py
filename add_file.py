@@ -8,6 +8,9 @@ from read_day import read_current_day
 current_day_file = r'C:\Users\marti\Desktop\Winc\superpy\current_day.txt'
 inventory_file = 'inventory_file.csv'
 
+"""All of the function that have to deal with a purchase:
+ buy an item, read how many items have been bought"""
+
 # ADD A PRODUCT FUNCTION
 def add_product(product_name, count, buy_price, expiration_date):
     product_id = generate_product_id()  # generate unique id for the product
@@ -52,8 +55,6 @@ def add_product(product_name, count, buy_price, expiration_date):
     print(f'You bought {count} {product_name}.')
 
 # this function help to read the items that have been bought in a certain date
-
-
 def read_bought(bought_file, days_ago=0, current_date=None):
 
     if current_date is None:

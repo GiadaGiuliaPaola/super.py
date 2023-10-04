@@ -1,5 +1,9 @@
-Orange,1,0.8,2024-01-01,9dc1
-Bruxell Sprout,1,3.3,2024-03-01,9dc1
-Apple,20,0.5,2023-12-31,443a
-Pear,7,0.5,2023-12-31,454f
-Apple,10,0.5,2023-12-31,264a
+Product Name,Count,Cost Price,Expiration Date,ID number
+Apple,32,0.00,2022-12-31,cf20
+Banana,2,0.00,2022-12-31,cf20
+Frikandel,10,0.00,2021-12-31,cf20
+Pear,41,0.00,2023-12-31,cf20
+Frikandel,10,0.00,2023-11-30,cf20
+Pizza,9,0.00,2023-12-31,cf20
+Soap,13,0.00,2023-12-31,cf20
+Strawberry,7,0.00,2023-12-31,cf20

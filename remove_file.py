@@ -4,8 +4,11 @@ from datetime import datetime, timedelta
 from generate_id import generate_product_id
 from read_day import read_current_day
 
-current_day_file = r'C:\Users\marti\Desktop\Winc\superpy\current_day.txt'
+current_day_file = r'current_day.txt'
 inventory_file = 'inventory_file.csv'
+
+"""All of the functions that have to deal with a selling process:
+ sell an item with a price, read how many items have been sold"""
 
 def remove_product(product_name, count, selling_price):
     product_id = generate_product_id()

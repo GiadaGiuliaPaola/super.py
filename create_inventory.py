@@ -1,24 +1,64 @@
 import csv
+from collections import defaultdict
 import tabulate
-from datetime import datetime, timedelta
-from generate_id import generate_product_id
 
-inventory_file = 'inventory_file.csv'
+"""This function is used to generate a inventory
+file csv taking in consideration ONLY the name of the product and the expiracy day.
+Is only used to check how many items are still in stock, not the cost (that is set to 0.00)"""
 
-#CREATE_INVENTORY
-def create_inventory_csv():
-    header = ['Product Name', 'Count', 'Buy Price', 'Expiration Date', 'ID number']
-    product_id = generate_product_id()
-    inventory = [
-        ['Orange', 1, 0.8, '2024-01-01',product_id],
-        ['Apple', 2, 1.2, '2024-02-01',product_id],
-        ['Bruxell Sprout', 1, 3.3, '2024-03-01',product_id],
-    ]
+def create_inventory_csv(bought_file, sold_file, output_file):
+    # Create dictionaries to store bought and sold items
+    bought_items = defaultdict(int)
+    sold_items = defaultdict(int)
 
-    with open(inventory_file, 'w', newline='') as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(header) 
-        csv_writer.writerows(inventory)
+    # Read and process the bought items
+    with open(bought_file, 'r', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            product_name = row['Product Name']
+            count = int(row['Count'])
+            expiration_date = row['Expiration Date']
+            bought_items[(product_name, expiration_date)] += count
+
+    # Read and process the sold items
+    with open(sold_file, 'r', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            product_name = row['Product Name']
+            count = int(row['Count'])
+            expiration_date = row['Expiration Date']
+            sold_items[(product_name, expiration_date)] += count
+
+    # Calculate the remaining count in inventory
+    inventory = {}
+    for (product_name, expiration_date), count in bought_items.items():
+        sold_count = sold_items.get((product_name, expiration_date), 0)
+        remaining_count = count - sold_count
+
+        # Create an inventory entry for this product and expiration date
+        if remaining_count >= 0:
+            inventory[(product_name, expiration_date)] = {
+                'Count': remaining_count,
+                'Cost Price': row.get('Cost Price', '0.00'),  # Replace with the actual Cost Price or zero
+                'ID number': row.get('ID number', 'inv1')  # Replace with the actual ID number or "inv1"
+            }
+
+    # Write the result to the output CSV file
+    with open(output_file, 'w', newline='') as csvfile:
+        fieldnames = ['Product Name', 'Count', 'Cost Price', 'Expiration Date', 'ID number']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for (product_name, expiration_date), item_data in inventory.items():
+            writer.writerow({
+                'Product Name': product_name,
+                'Count': item_data['Count'],
+                'Cost Price': item_data['Cost Price'],
+                'Expiration Date': expiration_date,
+                'ID number': item_data['ID number']
+            })
+
+# Example usage:
+create_inventory_csv('bought.csv', 'sold.csv', 'inventory_file.csv')
 
 #CREATE AND PRINT A TABLE FOR REDABILITY
 def read_inventory(inventory_file):

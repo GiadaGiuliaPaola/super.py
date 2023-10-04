@@ -4,6 +4,9 @@ import csv
 from datetime import datetime
 from revenue_profit import calculate_revenue
 
+"""This page works singulary with his own argaparse,
+it create a grafic base on the revenue"""
+
 #argaparse valid only for matplot_graph file
 parser = argparse.ArgumentParser(description="Plot revenue data")
 
